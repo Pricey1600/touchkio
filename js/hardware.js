@@ -3,6 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const fsp = require("fs/promises");
 const cpr = require("child_process");
+// mmWave sensor UART
+const { SerialPort } = require("serialport");
+const { ReadlineParser } = require("@serialport/parser-readline");
+
 
 global.HARDWARE = global.HARDWARE || {
   initialized: false,
@@ -30,6 +34,10 @@ global.HARDWARE = global.HARDWARE || {
   },
   audio: {
     device: null,
+  },
+  mmwave: {
+    presence: null,
+    port: null,
   },
 };
 
@@ -139,6 +147,10 @@ const init = async () => {
   setDisplayStatus("ON", () => {
     interval(update, 1000);
   });
+
+  // Init mmWave Sensor
+  initMmwave();
+
 
   return true;
 };
@@ -1034,6 +1046,80 @@ const interval = (callback, ms) => {
   run();
 };
 
+const initMmwave = () => {
+
+  // Prefer USB → UART → serial0 (fallback)
+  const devices = [
+    "/dev/ttyUSB0",
+    "/dev/ttyAMA0",
+    "/dev/ttyS0",
+    "/dev/serial0"
+  ];
+
+  let device = null;
+  for (const d of devices) {
+    if (fs.existsSync(d)) {
+      device = d;
+      break;
+    }
+  }
+
+  if (!device) {
+    console.warn("MMWave: No UART device found");
+    return;
+  }
+
+  console.info("MMWave: Using UART device:", device);
+
+  try {
+    const port = new SerialPort({
+      path: device,
+      baudRate: 115200,
+      autoOpen: true,
+    });
+
+    const parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+
+    HARDWARE.mmwave.port = port;
+
+    // --- Send manufacturer init hex frame ---
+    const initHex = "FDFCFBFA0800120000006400000004030201";
+    const initBytes = Buffer.from(initHex, "hex");
+    port.write(initBytes, err => {
+      if (err) console.error("MMWave init write error:", err.message);
+      else console.info("MMWave: Init command sent");
+    });
+
+    // --- Parse sensor output ---
+    parser.on("data", (line) => {
+      line = line.trim();
+      if (!line) return;
+
+      // Log raw line for debugging:
+      console.info("MMWave RAW:", line);
+
+      // Presence formats vary: "P1", "P0", "1", "0", "occupied", "unoccupied"
+      let newState = null;
+
+      if (/P1|1|occupied/i.test(line)) newState = "ON";
+      else if (/P0|0|unoccupied/i.test(line)) newState = "OFF";
+
+      if (newState && newState !== HARDWARE.mmwave.presence) {
+        HARDWARE.mmwave.presence = newState;
+        console.info("MMWave presence change:", newState);
+        EVENTS.emit("updateMmwave");
+      }
+    });
+
+    port.on("error", (err) => {
+      console.error("MMWave UART error:", err.message);
+    });
+
+  } catch (err) {
+    console.error("MMWave init failed:", err.message);
+  }
+};
+
 module.exports = {
   init,
   update,
@@ -1063,4 +1149,5 @@ module.exports = {
   execSyncCommand,
   execAsyncCommand,
   execScriptCommand,
+  getMmwavePresence: () => HARDWARE.mmwave.presence,
 };

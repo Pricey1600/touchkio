@@ -1,14 +1,14 @@
 {
-    "name": "touchkio",
-    "title": "TouchKio",
+    "name": "touchkiodev",
+    "title": "TouchKioDev",
     "description": "Home Assistant Touch Kiosk",
-    "homepage": "https://github.com/leukipp/touchkio",
-    "author": "leukipp",
+    "homepage": "https://github.com/Pricey1600/touchkio",
+    "author": "Pricey1600",
     "version": "1.4.0",
     "license": "MIT",
     "main": "index.js",
     "scripts": {
-        "start": "electron . --web-url=https://demo.home-assistant.io,https://demo.immichkiosk.app --trace-warnings",
+        "start": "electron . --web-url=http://192.168.4.53:8123 --trace-warnings",
         "build": "electron-forge make"
     },
     "prettier": {
@@ -26,6 +26,7 @@
     "dependencies": {
         "axios": "^1.12.2",
         "electron-log": "^5.4.3",
-        "mqtt": "^5.14.1"
+        "mqtt": "^5.14.1",
+        "serialport": "^13.0.0"
     }
 }

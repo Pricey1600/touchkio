@@ -92,6 +92,7 @@ const init = async () => {
       initBatteryLevel();
       initPackageUpgrades();
       initLastActive();
+      initMmwave();
 
       // Init client diagnostic
       initHeartbeat();
@@ -111,6 +112,7 @@ const init = async () => {
       EVENTS.on("updateVolume", updateVolume);
       EVENTS.on("updateKeyboard", updateKeyboard);
       EVENTS.on("consoleLog", updateErrors);
+      EVENTS.on("updateMmwave", updateMmwave);
     })
     .on("error", (error) => {
       console.error("MQTT", error.message);
@@ -1039,6 +1041,35 @@ const updateLastActive = async () => {
   publishState("last_active", lastActive);
   publishAttributes("last_active", tracker);
 };
+
+/**
+* Initializes the presence sensor
+*/
+const initMmwave = () => {
+  const root = `${INTEGRATION.root}/mmwave`;
+
+  const config = {
+    name: "Presence (mmWave)",
+    unique_id: `${INTEGRATION.node}_mmwave`,
+    state_topic: `${root}/state`,
+    value_template: "{{ value }}",
+    device_class: "presence",
+    icon: "mdi:motion-sensor",
+    device: INTEGRATION.device,
+  };
+
+  publishConfig("binary_sensor", config);
+  updateMmwave();
+};
+
+/**
+* Updates the presence sensor via the mqtt connection
+*/
+const updateMmwave = () => {
+  const presence = hardware.getMmwavePresence() || "OFF";
+  publishState("mmwave", presence);
+};
+
 
 /**
  * Initializes the heartbeat sensor.
