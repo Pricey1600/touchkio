@@ -1,15 +1,18 @@
-# TouchKio
-![build](https://img.shields.io/github/actions/workflow/status/leukipp/touchkio/release.yaml?style=flat-square)
-![date](https://img.shields.io/github/release-date/leukipp/touchkio?style=flat-square)
+> [!IMPORTANT]
+>Forked from the original project to add hardware features such as a mmWave sensor.
+>https://github.com/leukipp/touchkio
+
+# TouchKio (fork)
+![build](https://img.shields.io/github/actions/workflow/status/Pricey1600/touchkio/release.yaml?style=flat-square)
+![date](https://img.shields.io/github/release-date/Pricey1600/touchkio?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-%20arm64%20|%20x64%20-teal?style=flat-square)
-![downloads](https://img.shields.io/github/downloads/leukipp/touchkio/total?style=flat-square)
-[![sponsor](https://img.shields.io/github/sponsors/leukipp?color=red&logo=github&style=flat-square)](https://github.com/sponsors/leukipp)
+![downloads](https://img.shields.io/github/downloads/Pricey1600/touchkio/total?style=flat-square)
 
 **TouchKio** is a Node.js application that utilizes Electron to create a kiosk mode window specifically designed for a Home Assistant dashboard.
 This tool is packaged as a **.deb** file, making it easy to launch the kiosk application on any Debian based Linux [hardware](https://github.com/leukipp/touchkio/blob/main/HARDWARE.md) (e.g. **Raspberry Pi**) equipped with a **DSI or HDMI** Touch Display.
 Additional releases for other Linux systems are available as **.zip** file.
 
-[![display](https://raw.githubusercontent.com/leukipp/touchkio/main/img/display.png)](https://github.com/leukipp/touchkio/blob/main/img/display.png)
+[![display](https://raw.githubusercontent.com/Pricey1600/touchkio/main/img/display.png)](https://github.com/Pricey1600/touchkio/blob/main/img/display.png)
 
 This implementation addresses common issues encountered when using the built-in browser running in fullscreen mode on a Linux device with Touch Display.
 Moreover, the device running the **kiosk application** also offers several **Home Assistant MQTT** sensors, enhancing it's functionality for automation purposes.
@@ -33,12 +36,13 @@ Moreover, the device running the **kiosk application** also offers several **Hom
   - [x] Audio volume control for connected devices.
   - [x] Execute system reboot and shutdown commands.
   - [x] Monitor battery, temperature, processor and memory usage.
+  - [x] Support for mmWave sensor via serial UART.
 
 The kiosk application can be executed with command line arguments to load a **Home Assistant dashboard in fullscreen** mode.
 Additionally, a **MQTT endpoint** can be defined, allowing the application to provide controls and sensors for the Linux device and the connected Touch Display.
 
 ## Setup
-Before you begin, make sure that you have a Linux device configured and operational with a [compatible](https://github.com/leukipp/touchkio/blob/main/HARDWARE.md) Touch Display.
+Before you begin, make sure that you have a Linux device configured and operational with a [compatible](https://github.com/Pricey1600/touchkio/blob/main/HARDWARE.md) Touch Display.
 This guide assumes that you are using a Raspberry Pi with the latest version of Raspberry Pi OS **(64-bit)**, along with a desktop environment (preferred using **labwc**).
 However, the **.deb** setup procedure is also compatible with any other Debian based 64-bit system.
 
@@ -46,7 +50,7 @@ However, the **.deb** setup procedure is also compatible with any other Debian b
 To utilize the sensor features of your device through Home Assistant, it's essential to have a **MQTT broker running** and the **MQTT integration installed** on your Home Assistant instance.
 This setup allows seamless communication between your kiosk device and Home Assistant, enabling **real-time data exchange**.
 
-[![mqtt](https://raw.githubusercontent.com/leukipp/touchkio/main/img/mqtt.png)](https://github.com/leukipp/touchkio/blob/main/img/mqtt.png)
+[![mqtt](https://raw.githubusercontent.com/Pricey1600/touchkio/main/img/mqtt.png)](https://github.com/Pricey1600/touchkio/blob/main/img/mqtt.png)
 
 For a comprehensive guide on setting up MQTT with Home Assistant, please refer to the official documentation available here: https://www.home-assistant.io/integrations/mqtt.
 
@@ -55,13 +59,13 @@ On the first run of the application, you may encounter a **setup procedure** and
 It's recommended to create a dedicated Home Assistant user (local access only) for your kiosk device.
 
 You might also need a physical keyboard or remote VNC access to input these credentials once.
-If your hardware is [supported](https://github.com/leukipp/touchkio/blob/main/HARDWARE.md) you may be able to activate the on-screen keyboard using the side [widget](https://github.com/leukipp/touchkio/issues/16).
+If your hardware is [supported](https://github.com/Pricey1600/touchkio/blob/main/HARDWARE.md) you may be able to activate the on-screen keyboard using the side [widget](https://github.com/Pricey1600/touchkio/issues/16).
 
 #### Option 1 - The easy way
 Run this command to download and install the latest **.deb** (arm64 or x64) release.
 It will also create a systemd user file for auto-startup and will guide you through the setup process:
 ```bash
-bash <(wget -qO- https://raw.githubusercontent.com/leukipp/touchkio/main/install.sh)
+bash <(wget -qO- https://raw.githubusercontent.com/Pricey1600/touchkio/main/install.sh)
 ```
 Make sure that you run this with your **standard user** and not with root (sudo).
 If you are paranoid, or smart, or both, have a look into the [install.sh](https://github.com/leukipp/touchkio/blob/main/install.sh) script before executing external code on your machine.
@@ -75,9 +79,9 @@ systemctl --user start|stop|status|restart touchkio.service
 <details><summary>Alternatives</summary><div>
 
 #### Option 2 - The standard way
-When connected via SSH, it's necessary to export the display variables first, as outlined in the [development](https://github.com/leukipp/touchkio?tab=readme-ov-file#development) section.
-The [install.sh](https://github.com/leukipp/touchkio/blob/main/install.sh) script mentioned above performs the following tasks (and you just have to do it manually):
-- [Download](https://github.com/leukipp/touchkio/releases/latest) the latest version file that is suitable for your architecture (arm64 or x64).
+When connected via SSH, it's necessary to export the display variables first, as outlined in the [development](https://github.com/Pricey1600/touchkio?tab=readme-ov-file#development) section.
+The [install.sh](https://github.com/Pricey1600/touchkio/blob/main/install.sh) script mentioned above performs the following tasks (and you just have to do it manually):
+- [Download](https://github.com/Pricey1600/touchkio/releases/latest) the latest version file that is suitable for your architecture (arm64 or x64).
   - Debian (**deb**): Open a terminal and execute the following command to install the application, e.g: `sudo apt install ./touchkio_1.x.x_arm64.deb && touchkio --setup`
   - Others (**zip**): Extract the archive and run the binary, e.g: `unzip touchkio-linux-x64-1.x.x.zip && cd touchkio-linux-x64 && ./touchkio --setup`
 - If you just want to load a Home Assistant dashboard without further control you are good to go, e.g: `touchkio --web-url=https://demo.home-assistant.io`
@@ -89,7 +93,7 @@ The [install.sh](https://github.com/leukipp/touchkio/blob/main/install.sh) scrip
 Pre-built release files are available for arm64 and x64 Linux systems.
 If you are using a different architecture, you can still utilize this repository to build your own application.
 
-For more information please refer to the [development](https://github.com/leukipp/touchkio?tab=readme-ov-file#development) section, however this will do the job:
+For more information please refer to the [development](https://github.com/Pricey1600/touchkio?tab=readme-ov-file#development) section, however this will do the job:
 ```bash
 yarn build
 ```
@@ -99,10 +103,10 @@ yarn build
 #### Update
 If you have already installed TouchKio and want to upgrade to the latest version, simply install the newer version over the existing one.
 
-The [install.sh](https://github.com/leukipp/touchkio/blob/main/install.sh) script can also be run to update an existing installation to the **latest version**.
+The [install.sh](https://github.com/Pricey1600/touchkio/blob/main/install.sh) script can also be run to update an existing installation to the **latest version**.
 The setup procedure can be skipped to use the existing default arguments from the configuration file:
 ```bash
-bash <(wget -qO- https://raw.githubusercontent.com/leukipp/touchkio/main/install.sh) update
+bash <(wget -qO- https://raw.githubusercontent.com/Pricey1600/touchkio/main/install.sh) update
 ```
 
 ## Configuration
@@ -155,6 +159,11 @@ For example:
 ```bash
 touchkio --web-url=http://192.168.1.42:8123 --mqtt-url=mqtt://192.168.1.42:1883 --mqtt-user=kiosk --mqtt-password=password
 ```
+
+### mmWave Sensor
+To enable a mmWave sensor to be used via the Raspberry Pi's RX and TX pins, 'Serial Port' must be turned on in the Pi's control centre, while 'Serial Console' is turned off. You can change these on Raspberry Pi OS by going to **Prefrences** -> **Control Centre** -> **Interfaces**.
+
+The mmWave sensor implimentation is based on the [WaveShare HMMD mmWave Sensor](https://www.waveshare.com/wiki/HMMD_mmWave_Sensor).
 
 ## User Interface
 TouchKio provides a simple webview window designed specifically for Touch Displays. Electron apps are known to be resource intensive due to their architecture and the inclusion of a full web browser environment. If you just run the kiosk application without other heavy loads, everything should run smoothly.
@@ -269,22 +278,22 @@ This adjustment provides a user experience similar to that of a proper mobile de
 </div></details>
 
 ## Issues
-Please review the [hardware](https://github.com/leukipp/touchkio/blob/main/HARDWARE.md) documentation first if you encounter any problems.
+Please review the [hardware](https://github.com/Pricey1600/touchkio/blob/main/HARDWARE.md) documentation first if you encounter any problems.
 
 **Known Issues** that are by-design or for which there isn't a solution so far:
 - You can use Raspberry Pi's build-in [screen blanking](https://www.raspberrypi.com/documentation/computers/configuration.html#screen-blanking-3) functionality, however, if the screen is turned on through Home Assistant after being automatically turned off, it will remain on indefinitely.
   - It's recommended to either use the built-in screen blanking feature or implement a Home Assistant [automation](https://www.home-assistant.io/docs/automation/basics) (e.g. presence detection) to manage the screen status.
-  - An active VNC session can also interfere with the display state, you can find details about this in the features [section](https://github.com/leukipp/touchkio/blob/main/HARDWARE.md#features).
-- When using a Raspberry Pi, the on-screen keyboard doesn't [automatically pop-out](https://github.com/leukipp/touchkio/issues/4) when entering a text field inside the webview.
-  - As a current workaround you can use the side [widget](https://github.com/leukipp/touchkio/issues/16) to toggle the keyboard visibility.
-  - There is also an [experimental feature](https://github.com/leukipp/touchkio/issues/85) that uses a special Electron flag to address this problem.
+  - An active VNC session can also interfere with the display state, you can find details about this in the features [section](https://github.com/Pricey1600/touchkio/blob/main/HARDWARE.md#features).
+- When using a Raspberry Pi, the on-screen keyboard doesn't [automatically pop-out](https://github.com/Pricey1600/touchkio/issues/4) when entering a text field inside the webview.
+  - As a current workaround you can use the side [widget](https://github.com/Pricey1600/touchkio/issues/16) to toggle the keyboard visibility.
+  - There is also an [experimental feature](https://github.com/Pricey1600/touchkio/issues/85) that uses a special Electron flag to address this problem.
 - On the terminal you may see some _ERROR:gbm_wrapper.cc_ messages.
   - This appears to be a [known issue](https://github.com/electron/electron/issues/42322) that currently lacks a fix, but the webview still works.
 
 For debugging, stop the service and launch `touchkio` directly on the terminal to monitor the log output in real-time.
 This output is also written into `~/.config/touchkio/logs/main.log` for review.
 
-If you encounter any problems, please [create an issue](https://github.com/leukipp/touchkio/issues) and include the output of `touchkio --version`, additional information's about your system (such as operating system, hardware, etc.) and any relevant log files.
+If you encounter any problems, please [create an issue](https://github.com/Pricey1600/touchkio/issues) and include the output of `touchkio --version`, additional information's about your system (such as operating system, hardware, etc.) and any relevant log files.
 
 ## Credits
 [Inspired by](https://www.jeffgeerling.com/blog/2024/home-assistant-and-carplay-pi-touch-display-2) the one and only Raspberry Pi Master, Jeff Geerling ([@geerlingguy](https://github.com/geerlingguy)).

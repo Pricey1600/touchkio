@@ -93,6 +93,7 @@ const init = async () => {
       initPackageUpgrades();
       initLastActive();
       initMmwave();
+      initMmwaveFirmware();
 
       // Init client diagnostic
       initHeartbeat();
@@ -1053,7 +1054,7 @@ const initMmwave = () => {
     unique_id: `${INTEGRATION.node}_mmwave`,
     state_topic: `${root}/state`,
     value_template: "{{ value }}",
-    device_class: "presence",
+    device_class: "occupancy",
     icon: "mdi:motion-sensor",
     device: INTEGRATION.device,
   };
@@ -1068,6 +1069,35 @@ const initMmwave = () => {
 const updateMmwave = () => {
   const presence = hardware.getMmwavePresence() || "OFF";
   publishState("mmwave", presence);
+};
+
+/**
+ * Initializes the mmWave sensor's firmware sensor
+ */
+const initMmwaveFirmware = () => {
+  const root = `${INTEGRATION.root}/mmwave_firmware`;
+
+  const config = {
+    name: "mmWave Firmware Version",
+    unique_id: `${INTEGRATION.node}_mmwave_firmware`,
+    state_topic: `${root}/state`,
+    value_template: "{{ value }}",
+    device_class: "none",
+    entity_category: "diagnostic",
+    icon: "mdi:information",
+    device: INTEGRATION.device,
+  };
+
+  publishConfig("sensor", config);
+  updateMmwaveFirmware();
+};
+
+/**
+* Updates the mmWave firmware sensor via the mqtt connection
+*/
+const updateMmwaveFirmware = () => {
+  const firmware = hardware.getMmwaveFirmware();
+  publishState("mmwave", firmware);
 };
 
 

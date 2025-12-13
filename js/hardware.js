@@ -38,6 +38,7 @@ global.HARDWARE = global.HARDWARE || {
   mmwave: {
     presence: null,
     port: null,
+    firmware: null,
   },
 };
 
@@ -1071,8 +1072,16 @@ const initMmwave = () => {
 
   console.info("MMWave: Using UART device:", device);
 
+  getMmwaveFirmware(device);
+
   try {
-    const port = new SerialPort({
+    updateMmwave(device);
+  } catch (err) {
+    console.error("MMWave init failed:", err.message);
+  }
+};
+const updateMmwave = (device) => {
+  const port = new SerialPort({
       path: device,
       baudRate: 115200,
       autoOpen: true,
@@ -1096,7 +1105,7 @@ const initMmwave = () => {
       if (!line) return;
 
       // Log raw line for debugging:
-      console.info("MMWave RAW:", line);
+      //console.info("MMWave RAW:", line);
 
       // Presence formats vary: "P1", "P0", "1", "0", "occupied", "unoccupied"
       let newState = null;
@@ -1114,11 +1123,47 @@ const initMmwave = () => {
     port.on("error", (err) => {
       console.error("MMWave UART error:", err.message);
     });
-
-  } catch (err) {
-    console.error("MMWave init failed:", err.message);
-  }
 };
+const getMmwaveFirmware = (device) => {
+  const port = new SerialPort({
+      path: device,
+      baudRate: 115200,
+      autoOpen: true,
+    });
+
+    const parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+
+    HARDWARE.mmwave.port = port;
+
+    // --- Send manufacturer init hex frame ---
+    const initHex = "FDFCFBFA0200000004030201";
+    const initBytes = Buffer.from(initHex, "hex");
+    port.write(initBytes, err => {
+      if (err) console.error("MMWave init write error:", err.message);
+      else console.info("MMWave: Firmware command sent");
+    });
+
+    // --- Parse sensor output ---
+    parser.on("data", (line) => {
+      line = line.trim();
+      if (!line) return;
+
+      // Log raw line for debugging:
+      //console.info("MMWave RAW:", line);
+
+      let newState = line;
+
+      if (newState && newState !== HARDWARE.mmwave.firmware) {
+        HARDWARE.mmwave.firmware = newState;
+        console.info("MMWave firmware:", newState);
+        // EVENTS.emit("updateMmwave");
+      }
+    });
+
+    port.on("error", (err) => {
+      console.error("MMWave UART error:", err.message);
+    });
+}
 
 module.exports = {
   init,
@@ -1150,4 +1195,5 @@ module.exports = {
   execAsyncCommand,
   execScriptCommand,
   getMmwavePresence: () => HARDWARE.mmwave.presence,
+  getMmwaveFirmware: () => HARDWARE.mmwave.firmware,
 };
